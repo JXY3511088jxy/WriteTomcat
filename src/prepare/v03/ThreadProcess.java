@@ -17,7 +17,7 @@ public class ThreadProcess extends Thread{
         this.socket = socket;
     }
 
-    public void run(){
+    public void run(){//重写线程的run方法
 
         try {
             System.out.println("执行线程信息："+Thread.currentThread());
