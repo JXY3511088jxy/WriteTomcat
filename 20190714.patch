@@ -1,0 +1,479 @@
+Index: src/prepare/v01/TomcatServer01.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/prepare/v01/TomcatServer01.java	(date 1563112253842)
++++ src/prepare/v01/TomcatServer01.java	(date 1563112253842)
+@@ -0,0 +1,41 @@
++package prepare.v01;
++
++import javax.naming.NamingEnumeration;
++import java.io.BufferedReader;
++import java.io.InputStream;
++import java.io.InputStreamReader;
++import java.io.OutputStream;
++import java.net.ServerSocket;
++import java.net.Socket;
++
++public class TomcatServer01 {
++
++    public static void main(String[] args) throws Exception{
++
++        ServerSocket serverSocket = new ServerSocket(8088);//暴露服务的端口
++
++        System.out.println("Tomcat(v0.1)服务器已经启动");
++
++        while (true){//无限-----等待请求
++
++            Socket socket = serverSocket.accept();//使用socket建立连接，如果客户端连接上了
++            InputStream inputStream = socket.getInputStream();//服务端的输入，客户端的输出
++            System.out.println("收到请求");
++            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,"UTF-8"));
++            String msg = null;
++            while ((msg=reader.readLine())!=null){//读取每一行的信息
++                if (msg.length()==0){//如果没有信息可读，跳出循环
++                    break;
++                }
++                System.out.println(msg);
++            }
++            String res = "java是最好的语言";
++            OutputStream outputStream = socket.getOutputStream();
++            outputStream.write(res.getBytes());
++            outputStream.flush();
++            outputStream.close();
++            socket.close();
++        }
++
++    }
++}
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/modules.xml	(date 1563110873201)
++++ .idea/modules.xml	(date 1563110873201)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/WriteTomcat.iml" filepath="$PROJECT_DIR$/WriteTomcat.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+Index: src/http/Response.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/http/Response.java	(date 1563113092509)
++++ src/http/Response.java	(date 1563113092509)
+@@ -0,0 +1,25 @@
++package http;
++
++import java.io.OutputStream;
++
++/**
++ * Http的响应封装类
++ */
++public class Response {
++
++    public OutputStream outputStream;
++
++    //状态行
++    //Http版本、状态码、状态信息
++    //响应报文头部
++    //用于说明服务器要使用的附件资源
++    //空行
++    //请求头和主体数据间必须有换行
++    public static String responseHeader = "HTTP/1.1 200 \r\n"
++            +"Content-Type:text/html\r\n"
++            +"\r\n";
++
++    public Response(OutputStream outputStream) {
++        this.outputStream = outputStream;
++    }
++}
+Index: src/http/Request.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/http/Request.java	(date 1563112803421)
++++ src/http/Request.java	(date 1563112803421)
+@@ -0,0 +1,41 @@
++package http;
++
++import java.io.BufferedReader;
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.InputStreamReader;
++
++/**
++ * Http请求封装
++ */
++public class Request {
++    //请求类型
++    private String method;//get，post等方法
++    //请求资源的路径  url
++    private String url;
++
++    public Request(InputStream inputStream) throws IOException {
++        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,"UTF-8"));
++        String[] input = reader.readLine().split(" ");//读取第一行，成为一个数组
++        this.method = input[0];//数组的第一个
++        this.url = input[1];//数组的第二个
++
++
++    }
++
++    public String getMethod() {
++        return method;
++    }
++
++    public void setMethod(String method) {
++        this.method = method;
++    }
++
++    public String getUrl() {
++        return url;
++    }
++
++    public void setUrl(String url) {
++        this.url = url;
++    }
++}
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/misc.xml	(date 1563110873013)
++++ .idea/misc.xml	(date 1563110873013)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
++    <output url="file://$PROJECT_DIR$/out" />
++  </component>
++</project>
+\ No newline at end of file
+Index: WriteTomcat.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- WriteTomcat.iml	(date 1563110872894)
++++ WriteTomcat.iml	(date 1563110872894)
+@@ -0,0 +1,11 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module type="JAVA_MODULE" version="4">
++  <component name="NewModuleRootManager" inherit-compiler-output="true">
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
++    </content>
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+Index: .idea/uiDesigner.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/uiDesigner.xml	(date 1563112383286)
++++ .idea/uiDesigner.xml	(date 1563112383286)
+@@ -0,0 +1,124 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="Palette2">
++    <group name="Swing">
++      <item class="com.intellij.uiDesigner.HSpacer" tooltip-text="Horizontal Spacer" icon="/com/intellij/uiDesigner/icons/hspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="1" hsize-policy="6" anchor="0" fill="1" />
++      </item>
++      <item class="com.intellij.uiDesigner.VSpacer" tooltip-text="Vertical Spacer" icon="/com/intellij/uiDesigner/icons/vspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="1" anchor="0" fill="2" />
++      </item>
++      <item class="javax.swing.JPanel" icon="/com/intellij/uiDesigner/icons/panel.png" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3" />
++      </item>
++      <item class="javax.swing.JScrollPane" icon="/com/intellij/uiDesigner/icons/scrollPane.png" removable="false" auto-create-binding="false" can-attach-label="true">
++        <default-constraints vsize-policy="7" hsize-policy="7" anchor="0" fill="3" />
++      </item>
++      <item class="javax.swing.JButton" icon="/com/intellij/uiDesigner/icons/button.png" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="3" anchor="0" fill="1" />
++        <initial-values>
++          <property name="text" value="Button" />
++        </initial-values>
++      </item>
++      <item class="javax.swing.JRadioButton" icon="/com/intellij/uiDesigner/icons/radioButton.png" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="3" anchor="8" fill="0" />
++        <initial-values>
++          <property name="text" value="RadioButton" />
++        </initial-values>
++      </item>
++      <item class="javax.swing.JCheckBox" icon="/com/intellij/uiDesigner/icons/checkBox.png" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="3" anchor="8" fill="0" />
++        <initial-values>
++          <property name="text" value="CheckBox" />
++        </initial-values>
++      </item>
++      <item class="javax.swing.JLabel" icon="/com/intellij/uiDesigner/icons/label.png" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="0" anchor="8" fill="0" />
++        <initial-values>
++          <property name="text" value="Label" />
++        </initial-values>
++      </item>
++      <item class="javax.swing.JTextField" icon="/com/intellij/uiDesigner/icons/textField.png" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
++          <preferred-size width="150" height="-1" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JPasswordField" icon="/com/intellij/uiDesigner/icons/passwordField.png" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
++          <preferred-size width="150" height="-1" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JFormattedTextField" icon="/com/intellij/uiDesigner/icons/formattedTextField.png" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
++          <preferred-size width="150" height="-1" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JTextArea" icon="/com/intellij/uiDesigner/icons/textArea.png" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JTextPane" icon="/com/intellij/uiDesigner/icons/textPane.png" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JEditorPane" icon="/com/intellij/uiDesigner/icons/editorPane.png" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JComboBox" icon="/com/intellij/uiDesigner/icons/comboBox.png" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="0" hsize-policy="2" anchor="8" fill="1" />
++      </item>
++      <item class="javax.swing.JTable" icon="/com/intellij/uiDesigner/icons/table.png" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JList" icon="/com/intellij/uiDesigner/icons/list.png" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="2" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JTree" icon="/com/intellij/uiDesigner/icons/tree.png" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
++          <preferred-size width="150" height="50" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JTabbedPane" icon="/com/intellij/uiDesigner/icons/tabbedPane.png" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3">
++          <preferred-size width="200" height="200" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JSplitPane" icon="/com/intellij/uiDesigner/icons/splitPane.png" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3">
++          <preferred-size width="200" height="200" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JSpinner" icon="/com/intellij/uiDesigner/icons/spinner.png" removable="false" auto-create-binding="true" can-attach-label="true">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
++      </item>
++      <item class="javax.swing.JSlider" icon="/com/intellij/uiDesigner/icons/slider.png" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
++      </item>
++      <item class="javax.swing.JSeparator" icon="/com/intellij/uiDesigner/icons/separator.png" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3" />
++      </item>
++      <item class="javax.swing.JProgressBar" icon="/com/intellij/uiDesigner/icons/progressbar.png" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="0" fill="1" />
++      </item>
++      <item class="javax.swing.JToolBar" icon="/com/intellij/uiDesigner/icons/toolbar.png" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="6" anchor="0" fill="1">
++          <preferred-size width="-1" height="20" />
++        </default-constraints>
++      </item>
++      <item class="javax.swing.JToolBar$Separator" icon="/com/intellij/uiDesigner/icons/toolbarSeparator.png" removable="false" auto-create-binding="false" can-attach-label="false">
++        <default-constraints vsize-policy="0" hsize-policy="0" anchor="0" fill="1" />
++      </item>
++      <item class="javax.swing.JScrollBar" icon="/com/intellij/uiDesigner/icons/scrollbar.png" removable="false" auto-create-binding="true" can-attach-label="false">
++        <default-constraints vsize-policy="6" hsize-policy="0" anchor="0" fill="2" />
++      </item>
++    </group>
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/vcs.xml	(date 1563115844061)
++++ .idea/vcs.xml	(date 1563115844061)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
++    <mapping directory="$PROJECT_DIR$" vcs="Git" />
++    <mapping directory="$PROJECT_DIR$/src/prepare/v01" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
+Index: src/prepare/v03/ThreadProcess.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/prepare/v03/ThreadProcess.java	(date 1563114704276)
++++ src/prepare/v03/ThreadProcess.java	(date 1563114704276)
+@@ -0,0 +1,54 @@
++package prepare.v03;
++
++import http.Request;
++import http.Response;
++
++import java.io.OutputStream;
++import java.net.Socket;
++
++/**
++ * 自定义的一个线程---专门用于执行tomcat
++ */
++public class ThreadProcess extends Thread{
++
++    protected Socket socket;//连接
++
++    public ThreadProcess(Socket socket) {
++        this.socket = socket;
++    }
++
++    public void run(){
++
++        try {
++            System.out.println("执行线程信息："+Thread.currentThread());
++            Request request = new Request(socket.getInputStream());//使用请求封装类来处理请求
++            System.out.println("请求的method类型："+request.getMethod());
++            System.out.println("请求的路径url："+request.getUrl());
++
++
++            String res = Response.responseHeader+ "java是最好的语言";//使用HTTP规范的报文头
++            OutputStream outputStream = socket.getOutputStream();
++            outputStream.write(res.getBytes());
++            outputStream.flush();
++            outputStream.close();
++            socket.close();
++
++        }catch (Exception e){
++            e.printStackTrace();
++        }
++        finally {
++
++            if (socket!=null){
++                try{
++                    socket.close();
++                }catch (Exception e1){
++                    e1.printStackTrace();
++                }
++            }
++
++
++        }
++
++
++    }
++}
+Index: src/prepare/v03/TomcatServer03.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/prepare/v03/TomcatServer03.java	(date 1563114704196)
++++ src/prepare/v03/TomcatServer03.java	(date 1563114704196)
+@@ -0,0 +1,29 @@
++package prepare.v03;
++
++import http.Request;
++import http.Response;
++
++import java.io.OutputStream;
++import java.net.ServerSocket;
++import java.net.Socket;
++
++/**
++ * 手写版本3.0版本，加入多线程处理模式BIO
++ */
++public class TomcatServer03 {
++
++    public static void main(String[] args) throws Exception{
++
++        ServerSocket serverSocket = new ServerSocket(8088);//暴露服务的端口
++
++        System.out.println("Tomcat(v0.3)服务器已经启动");
++
++        while (true){//无限-----等待请求
++
++            Socket socket = serverSocket.accept();//使用socket建立连接，如果客户端连接上了
++            Thread thread = new ThreadProcess(socket);
++            thread.start();
++        }
++
++    }
++}
+Index: src/prepare/v02/TomcatServer02.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/prepare/v02/TomcatServer02.java	(date 1563113594163)
++++ src/prepare/v02/TomcatServer02.java	(date 1563113594163)
+@@ -0,0 +1,39 @@
++package prepare.v02;
++
++import http.Request;
++import http.Response;
++
++import java.io.BufferedReader;
++import java.io.InputStream;
++import java.io.InputStreamReader;
++import java.io.OutputStream;
++import java.net.ServerSocket;
++import java.net.Socket;
++
++public class TomcatServer02 {
++
++    public static void main(String[] args) throws Exception{
++
++        ServerSocket serverSocket = new ServerSocket(8088);//暴露服务的端口
++
++        System.out.println("Tomcat(v0.2)服务器已经启动");
++
++        while (true){//无限-----等待请求
++
++            System.out.println("执行线程信息："+Thread.currentThread());
++            Socket socket = serverSocket.accept();//使用socket建立连接，如果客户端连接上了
++            Request request = new Request(socket.getInputStream());//使用请求封装类来处理请求
++            System.out.println("请求的method类型："+request.getMethod());
++            System.out.println("请求的路径url："+request.getUrl());
++
++
++            String res = Response.responseHeader+ "java是最好的语言";//使用HTTP规范的报文头
++            OutputStream outputStream = socket.getOutputStream();
++            outputStream.write(res.getBytes());
++            outputStream.flush();
++            outputStream.close();
++            socket.close();
++        }
++
++    }
++}
