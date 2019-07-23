@@ -26,7 +26,7 @@ public class ThreadProcess extends Thread{
             System.out.println("请求的路径url："+request.getUrl());
 
 
-            String res = Response.responseHeader+ "java是最好的语言";//使用HTTP规范的报文头
+            String res = Response.responseHeader+ "java";//使用HTTP规范的报文头
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(res.getBytes());
             outputStream.flush();

@@ -14,16 +14,18 @@ public class TomcatServer03 {
 
     public static void main(String[] args) throws Exception{
 
-        ServerSocket serverSocket = new ServerSocket(8088);//暴露服务的端口
+        ServerSocket serverSocket = new ServerSocket(8888);//暴露服务的端口
 
         System.out.println("Tomcat(v0.3)服务器已经启动");
 
         while (true){//无限-----等待请求
 
             Socket socket = serverSocket.accept();//使用socket建立连接，如果客户端连接上了
-            Thread thread = new ThreadProcess(socket);
+            Thread thread = new ThreadProcess(socket);//使用线程执行
             thread.start();
         }
 
     }
 }
+
+

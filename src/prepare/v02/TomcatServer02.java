@@ -14,7 +14,7 @@ public class TomcatServer02 {
 
     public static void main(String[] args) throws Exception{
 
-        ServerSocket serverSocket = new ServerSocket(8088);//暴露服务的端口
+        ServerSocket serverSocket = new ServerSocket(8888);//暴露服务的端口
 
         System.out.println("Tomcat(v0.2)服务器已经启动");
 
